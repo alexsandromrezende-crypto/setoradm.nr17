@@ -1,0 +1,73 @@
+
+<div id="visualizador" style="
+  width:100%;
+  height:500px;
+  background:#18232c;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  border-radius:12px;
+  cursor:grab;
+  touch-action:none;
+">
+  <img id="imagem" 
+       src="URL_PUBLICA_DA_IMAGEM"
+       alt="Ambiente industrial"
+       style="max-width:90%;max-height:90%;pointer-events:none;">
+</div>
+
+<div style="text-align:center;margin:15px;">
+  <button onclick="girar(-15)">↶ Girar</button>
+  <button onclick="girar(15)">Girar ↷</button>
+  <button onclick="restaurar()">Restaurar</button>
+</div>
+
+<script>
+const area = document.getElementById("visualizador");
+const img = document.getElementById("imagem");
+
+let angulo = 0;
+let escala = 1;
+let ativo = false;
+let anterior = 0;
+
+function atualizar(){
+  img.style.transform =
+    `rotate(${angulo}deg) scale(${escala})`;
+}
+
+function girar(valor){
+  angulo += valor;
+  atualizar();
+}
+
+function restaurar(){
+  angulo = 0;
+  escala = 1;
+  atualizar();
+}
+
+area.addEventListener("pointerdown", e=>{
+  ativo = true;
+  anterior = e.clientX;
+  area.setPointerCapture(e.pointerId);
+});
+
+area.addEventListener("pointermove", e=>{
+  if(!ativo) return;
+  angulo += (e.clientX-anterior)*0.7;
+  anterior = e.clientX;
+  atualizar();
+});
+
+area.addEventListener("pointerup", ()=>ativo=false);
+area.addEventListener("pointercancel", ()=>ativo=false);
+
+area.addEventListener("wheel", e=>{
+  e.preventDefault();
+  escala = Math.max(0.5,Math.min(2.5,
+    escala + (e.deltaY < 0 ? 0.1 : -0.1)));
+  atualizar();
+},{passive:false});
+</script>
